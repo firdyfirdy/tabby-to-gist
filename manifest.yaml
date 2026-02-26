@@ -1,0 +1,10 @@
+name: tabby-to-gist
+description: Sync your Tabby Terminal config.yaml to a private GitHub Gist
+version: 1.0.0
+author: Tri Firdyanto
+homepage: https://github.com/firdyfirdy/tabby-to-gist
+keywords:
+  - tabby
+  - sync
+  - gist
+  - github

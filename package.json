@@ -1,0 +1,36 @@
+{
+  "name": "tabby-to-gist",
+  "version": "1.0.0",
+  "description": "Sync Tabby Terminal config to a private GitHub Gist",
+  "author": "Tri Firdyanto",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "build:watch": "webpack --config webpack.config.js --watch"
+  },
+  "keywords": [
+    "terminus-plugin",
+    "tabby-plugin"
+  ],
+  "peerDependencies": {
+    "tabby-core": "*",
+    "tabby-settings": "*"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.1.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@angular/common": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@types/node": "^20.11.0",
+    "@types/uuid": "^9.0.7",
+    "tabby-core": "^1.0.231-nightly.0",
+    "tabby-settings": "^1.0.231-nightly.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4"
+  }
+}
