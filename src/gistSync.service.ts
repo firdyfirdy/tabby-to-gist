@@ -19,8 +19,13 @@ const VAULT_SECRET_KEY = { id: 'github-pat' }
 const DEBOUNCE_MS = 3000
 
 function getTabbyConfigDir(): string {
-    const base = process.env.APPDATA ?? path.join(os.homedir(), '.config')
-    return path.join(base, 'tabby')
+    if (process.platform === 'win32' && process.env.APPDATA) {
+        return path.join(process.env.APPDATA, 'tabby')
+    }
+    if (process.platform === 'darwin') {
+        return path.join(os.homedir(), 'Library', 'Application Support', 'tabby')
+    }
+    return path.join(os.homedir(), '.config', 'tabby')
 }
 
 @Injectable({ providedIn: 'root' })
