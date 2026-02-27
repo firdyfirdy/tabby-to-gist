@@ -145,11 +145,37 @@ import { PlatformService } from 'tabby-core'
     <div *ngIf="activeTab === 'author'" class="tab-body">
       <div class="about-card">
         <div class="about-title">Tabby to Gist Sync</div>
-        <div class="about-version">v1.1.0</div>
+        <div class="about-version">v1.2.0</div>
         <p class="about-desc">
           A lightweight Tabby Terminal plugin that syncs your <code>config.yaml</code>
-          to a private GitHub Gist, and provides a built-in SSH Key Pair Generator.
+          to a private GitHub Gist, provides real-time server monitoring, and includes
+          a built-in SSH Key Pair Generator.
         </p>
+
+        <div class="about-features">
+          <div class="about-feature-item">
+            <i class="fas fa-sync-alt"></i>
+            <div>
+              <strong>Gist Config Sync</strong>
+              <div class="about-feature-desc">Auto-sync config across devices via private GitHub Gist with Vault-secured PAT</div>
+            </div>
+          </div>
+          <div class="about-feature-item">
+            <i class="fas fa-satellite-dish"></i>
+            <div>
+              <strong>Server Monitoring</strong>
+              <div class="about-feature-desc">Real-time CPU, memory, disk, network & uptime for multiple SSH servers — agentless, cross-platform</div>
+            </div>
+          </div>
+          <div class="about-feature-item">
+            <i class="fas fa-key"></i>
+            <div>
+              <strong>SSH Key Generator</strong>
+              <div class="about-feature-desc">Generate Ed25519, ECDSA, RSA key pairs in OpenSSH format with one-click copy & export</div>
+            </div>
+          </div>
+        </div>
+
         <div class="about-meta">
           <div><strong>Author:</strong> Tri Firdyanto</div>
           <div class="mt-2">
@@ -158,7 +184,7 @@ import { PlatformService } from 'tabby-core'
           </div>
         </div>
         <div class="about-footer">
-          Uses Tabby's native Vault storage for secure token management and atomic file writes to prevent config corruption.
+          Uses Tabby's native Vault storage for secure token &amp; key management. Atomic file writes prevent config corruption. System SSH for maximum compatibility.
         </div>
       </div>
     </div>
@@ -364,6 +390,35 @@ import { PlatformService } from 'tabby-core'
       color: rgba(255,255,255,.6);
       line-height: 1.6;
       margin-bottom: 20px;
+    }
+    .about-features {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .about-feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .about-feature-item > i {
+      color: var(--theme-fg-more, #4fc3f7);
+      font-size: 14px;
+      margin-top: 2px;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .about-feature-item strong {
+      color: rgba(255,255,255,.85);
+    }
+    .about-feature-desc {
+      font-size: 11.5px;
+      color: rgba(255,255,255,.45);
+      margin-top: 2px;
+      line-height: 1.4;
     }
     .about-meta { font-size: 13px; color: rgba(255,255,255,.7); }
     .about-meta a { color: var(--theme-fg-more, #4fc3f7); }
