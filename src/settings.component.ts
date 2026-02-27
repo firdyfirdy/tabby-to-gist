@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core'
 import { GistSyncService } from './gistSync.service'
+import { KeygenService, KeyType } from './keygen.service'
+import { PlatformService } from 'tabby-core'
 
 @Component({
   selector: 'gist-settings',
   template: `
     <div class="tabs-holder">
       <div class="tab-btn" [class.active]="activeTab === 'sync'" (click)="activeTab = 'sync'">Sync</div>
+      <div class="tab-btn" [class.active]="activeTab === 'keygen'" (click)="activeTab = 'keygen'">Key Generator</div>
       <div class="tab-btn" [class.active]="activeTab === 'author'" (click)="activeTab = 'author'">About</div>
     </div>
 
@@ -81,6 +84,61 @@ import { GistSyncService } from './gistSync.service'
           {{ actionResult }}
         </div>
       </div>
+    </div>
+
+    <!-- ─── KEY GENERATOR TAB ─── -->
+    <div *ngIf="activeTab === 'keygen'" class="tab-body">
+
+      <div class="section">
+        <div class="section-header">Generate SSH Key Pair</div>
+        <div class="section-desc">Select a key type and generate a new SSH key pair. Keys are generated locally and never leave your machine.</div>
+
+        <div class="keygen-controls">
+          <select class="form-control keygen-select" [(ngModel)]="selectedKeyType">
+            <option value="ed25519">Ed25519 (recommended)</option>
+            <option value="ecdsa">ECDSA (P-256)</option>
+            <option value="rsa">RSA (4096-bit)</option>
+          </select>
+          <button class="btn btn-primary ml-2" (click)="generateKeys()" [disabled]="generating">
+            {{ generating ? 'Generating...' : 'Generate' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="generatedPrivateKey" class="section">
+        <div class="key-block">
+          <div class="key-label">
+            Private Key
+            <span class="key-actions">
+              <button class="btn-icon" (click)="copyKey('private')" title="Copy">
+                <i [class]="copiedPrivate ? 'fas fa-check' : 'fas fa-copy'"></i>
+              </button>
+              <button class="btn-icon" (click)="exportKey('private')" title="Export">
+                <i class="fas fa-download"></i>
+              </button>
+            </span>
+          </div>
+          <textarea class="key-textarea" readonly [value]="generatedPrivateKey" rows="8"></textarea>
+        </div>
+      </div>
+
+      <div *ngIf="generatedPublicKey" class="section">
+        <div class="key-block">
+          <div class="key-label">
+            Public Key
+            <span class="key-actions">
+              <button class="btn-icon" (click)="copyKey('public')" title="Copy">
+                <i [class]="copiedPublic ? 'fas fa-check' : 'fas fa-copy'"></i>
+              </button>
+              <button class="btn-icon" (click)="exportKey('public')" title="Export">
+                <i class="fas fa-download"></i>
+              </button>
+            </span>
+          </div>
+          <textarea class="key-textarea" readonly [value]="generatedPublicKey" rows="4"></textarea>
+        </div>
+      </div>
+
     </div>
 
     <!-- ─── ABOUT TAB ─── -->
@@ -227,6 +285,56 @@ import { GistSyncService } from './gistSync.service'
     /* ── Action buttons ── */
     .btn-row { display: flex; align-items: center; }
 
+    /* ── Keygen ── */
+    .keygen-controls {
+      display: flex;
+      align-items: center;
+      max-width: 400px;
+    }
+    .keygen-select { flex: 1; }
+    .key-block { margin-bottom: 8px; }
+    .key-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .key-actions { display: flex; gap: 6px; }
+    .btn-icon {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 4px;
+      color: rgba(255,255,255,.6);
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all .15s;
+      font-size: 12px;
+    }
+    .btn-icon:hover {
+      background: rgba(255,255,255,.15);
+      color: #fff;
+    }
+    .btn-icon .fa-check { color: #81c784; }
+    .key-textarea {
+      width: 100%;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px;
+      color: rgba(255,255,255,.8);
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 11px;
+      padding: 12px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .key-textarea:focus { outline: none; border-color: rgba(255,255,255,.2); }
+
     /* ── Action result ── */
     .action-result {
       margin-top: 12px;
@@ -268,7 +376,7 @@ import { GistSyncService } from './gistSync.service'
   `]
 })
 export class GistSettingsComponent implements OnInit {
-  activeTab: 'sync' | 'author' = 'sync'
+  activeTab: 'sync' | 'keygen' | 'author' = 'sync'
   enabled = false
   gistId = ''
   pat = ''
@@ -280,7 +388,19 @@ export class GistSettingsComponent implements OnInit {
   actionResult = ''
   actionIsError = false
 
-  constructor(private syncService: GistSyncService) { }
+  // Keygen state
+  selectedKeyType: KeyType = 'ed25519'
+  generating = false
+  generatedPrivateKey = ''
+  generatedPublicKey = ''
+  copiedPrivate = false
+  copiedPublic = false
+
+  constructor(
+    private syncService: GistSyncService,
+    private keygen: KeygenService,
+    private platform: PlatformService,
+  ) { }
 
   async ngOnInit(): Promise<void> {
     this.refreshConfig()
@@ -336,5 +456,44 @@ export class GistSettingsComponent implements OnInit {
     this.actionResult = result
     this.actionIsError = result.toLowerCase().includes('fail')
     this.actionLoading = false
+  }
+
+  // ── Keygen ──
+
+  generateKeys(): void {
+    this.generating = true
+    setTimeout(() => {
+      const result = this.keygen.generate(this.selectedKeyType)
+      this.generatedPrivateKey = result.privateKey
+      this.generatedPublicKey = result.publicKey
+      this.generating = false
+    }, 50)
+  }
+
+  copyKey(which: 'private' | 'public'): void {
+    const text = which === 'private' ? this.generatedPrivateKey : this.generatedPublicKey
+    this.platform.setClipboard({ text })
+    if (which === 'private') {
+      this.copiedPrivate = true
+      setTimeout(() => { this.copiedPrivate = false }, 2000)
+    } else {
+      this.copiedPublic = true
+      setTimeout(() => { this.copiedPublic = false }, 2000)
+    }
+  }
+
+  async exportKey(which: 'private' | 'public'): Promise<void> {
+    const text = which === 'private' ? this.generatedPrivateKey : this.generatedPublicKey
+    const defaultName = which === 'private' ? `id_${this.selectedKeyType}` : `id_${this.selectedKeyType}.pub`
+    const data = Buffer.from(text, 'utf-8')
+    try {
+      const download = await this.platform.startDownload(defaultName, 0o600, data.length)
+      if (download) {
+        await download.write(data)
+        download.close()
+      }
+    } catch (_) {
+      // user cancelled
+    }
   }
 }
