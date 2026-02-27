@@ -1,7 +1,7 @@
 {
   "name": "tabby-to-gist",
-  "version": "1.1.0",
-  "description": "Sync Tabby Terminal config to a private GitHub Gist",
+  "version": "1.2.0",
+  "description": "Sync Tabby Terminal config to a private GitHub Gist + Real-time Server Monitoring",
   "author": "Tri Firdyanto",
   "main": "dist/index.js",
   "scripts": {

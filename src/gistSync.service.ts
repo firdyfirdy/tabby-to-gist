@@ -77,9 +77,17 @@ export class GistSyncService {
                 const remoteConfigContent = gist.files?.[CONFIG_FILENAME]?.content
                 if (!remoteConfigContent) return 'Remote config file is empty.'
 
+                // Preserve plugin config — remote Gist won't contain it
+                const pluginCfgSnapshot = JSON.parse(JSON.stringify(this.config.store['tabbyToGist'] ?? {}))
+
                 this.atomicWrite(path.join(this.configDir, CONFIG_FILENAME), remoteConfigContent)
                 this.writeLocalMeta(remoteMeta)
                 await this.config.load()
+
+                // Restore plugin config that config.load() may have reset
+                if (!this.config.store['tabbyToGist']) this.config.store['tabbyToGist'] = {}
+                Object.assign(this.config.store['tabbyToGist'], pluginCfgSnapshot)
+                this.config.save()
                 this.notifications.info('[tabby-to-gist] Config pulled from Gist.')
                 return 'Pull successful. Config updated from Gist.'
             } else {
@@ -143,9 +151,15 @@ export class GistSyncService {
             if (remoteTs > localTs) {
                 const remoteConfigContent = gist.files?.[CONFIG_FILENAME]?.content
                 if (remoteConfigContent) {
+                    const pluginCfgSnapshot = JSON.parse(JSON.stringify(this.config.store['tabbyToGist'] ?? {}))
+
                     this.atomicWrite(path.join(this.configDir, CONFIG_FILENAME), remoteConfigContent)
                     this.writeLocalMeta(remoteMeta)
                     await this.config.load()
+
+                    if (!this.config.store['tabbyToGist']) this.config.store['tabbyToGist'] = {}
+                    Object.assign(this.config.store['tabbyToGist'], pluginCfgSnapshot)
+                    this.config.save()
                     this.notifications.info('[tabby-to-gist] Config auto-synced from remote background check.')
                 }
             }
