@@ -145,10 +145,10 @@ import { PlatformService } from 'tabby-core'
     <div *ngIf="activeTab === 'author'" class="tab-body">
       <div class="about-card">
         <div class="about-title">Tabby to Gist Sync</div>
-        <div class="about-version">v1.0.0</div>
+        <div class="about-version">v1.1.0</div>
         <p class="about-desc">
           A lightweight Tabby Terminal plugin that syncs your <code>config.yaml</code>
-          to a private GitHub Gist — enabling seamless configuration roaming across all your devices.
+          to a private GitHub Gist, and provides a built-in SSH Key Pair Generator.
         </p>
         <div class="about-meta">
           <div><strong>Author:</strong> Tri Firdyanto</div>

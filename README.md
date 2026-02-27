@@ -9,6 +9,7 @@ A lightweight [Tabby Terminal](https://tabby.sh/) plugin that seamlessly syncs y
 - **Auto Gist Creation**: Automatically creates a private Gist for you if you don't already have one.
 - **Configurable Auto-Sync**: Automatically pushes your local changes to the Gist based on a configurable polling interval.
 - **Atomic Writes**: Safe and reliable config loading to prevent corruption.
+- **SSH Key Generator**: Built-in tool to generate Ed25519, ECDSA, and RSA key pairs locally in proper OpenSSH format, with one-click copy and export.
 
 ## How to Build and Deploy Locally
 
