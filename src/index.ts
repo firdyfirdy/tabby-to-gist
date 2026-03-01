@@ -28,6 +28,7 @@ class GistSyncConfigProvider extends ConfigProvider {
 @NgModule({
     imports: [CommonModule, FormsModule],
     providers: [
+        { provide: ConfigProvider, useClass: GistSyncConfigProvider, multi: true },
         { provide: SettingsTabProvider, useClass: GistSyncSettingsTabProvider, multi: true },
         { provide: ProfileProvider, useClass: MonitorProfileProvider, multi: true },
     ],
